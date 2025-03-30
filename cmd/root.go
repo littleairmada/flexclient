@@ -5,7 +5,6 @@ package cmd
 
 import (
 	"fmt"
-	"log"
 	"math"
 	"net"
 	"os"
@@ -73,13 +72,8 @@ var rootCmd = &cobra.Command{
 			// DEBUG
 			// fmt.Println("addr.String: ", addr.(*net.UDPAddr).IP.String())
 
-			// Ignore packets from 127.0.0.1 or packets from the VPN client subnet. (Currently hardcoded for a test network)
-			firstCheck, err := cidrRangeContains("10.5.0.0/24", addr.(*net.UDPAddr).IP.String())
-			if err != nil {
-				log.Println(err)
-			}
-
-			if !firstCheck && addr.(*net.UDPAddr).IP.String() != "127.0.0.1" {
+			// Ignore packets only from 127.0.0.1, but no longer ignore 10.5.0.0/24
+			if addr.(*net.UDPAddr).IP.String() != "127.0.0.1" {
 				go handlePacket(udpServer, addr, buf)
 			}
 		}
